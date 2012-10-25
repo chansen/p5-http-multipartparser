@@ -1,0 +1,36 @@
+=head1 NAME
+
+Parse::HTTP::Multipart - 
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item B<(F)> Usage: %s
+
+Method called with wrong number of arguments.
+
+=back
+
+=head1 SEE ALSO
+
+=head1 SUPPORT
+
+=head1 AUTHOR
+
+Christian Hansen C<chansen@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2012 by Christian Hansen.
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+
