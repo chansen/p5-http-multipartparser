@@ -126,7 +126,7 @@ $_mk_parser = sub {
                         $finish && $on_error->(q/End of stream encountered while parsing closing boundary/);
                         last;
                     }
-                    elsif (substr($buffer, 2, 4) eq CRLF) {
+                    elsif (substr($buffer, 2, 2) eq CRLF) {
                         substr($buffer, 0, 4, '');
                         $state = STATE_EPILOGUE;
                     }
