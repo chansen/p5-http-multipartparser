@@ -15,33 +15,42 @@ my $_mk_parser;
 sub new {
     my ($class, %params) = @_;
 
-    Carp::croak(q/Mandatory parameter 'boundary' is missing/)
-      unless exists $params{boundary};
-
-    Carp::croak(q/Parameter 'boundary' is not a non-empty string/)
-      unless ref \$params{boundary} eq 'SCALAR' && length $params{boundary};
-
-    Carp::croak(q/Mandatory parameter 'on_header' is missing/)
-      unless exists $params{on_header};
-
-    Carp::croak(q/Parameter 'on_header' is not a CODE reference/)
-      unless ref $params{on_header} eq 'CODE'; 
-
-    Carp::croak(q/Mandatory parameter 'on_body' is missing/)
-      unless exists $params{on_body};
-
-    Carp::croak(q/Parameter 'on_body' is not a CODE reference/)
-      unless ref $params{on_body} eq 'CODE';
-
-    Carp::croak(q/Parameter 'on_error' is not a CODE reference/)
-      unless !exists $params{on_error} || ref $params{on_error} eq 'CODE';
-
-    my $self  = bless {
-        max_preamble_size => 32 * 1024,
-        max_header_size   => 32 * 1024,
+    my $self = {
         on_error          => \&Carp::croak,
-        %params,
-    }, $class;
+        max_header_size   => 32 * 1024,
+        max_preamble_size => 32 * 1024,
+    };
+
+    while (my ($p, $v) = each %params) {
+        if ($p eq 'boundary') {
+            Carp::croak(q/Parameter 'boundary' is not a non-empty string/)
+              unless ref \$v eq 'SCALAR' && defined $v && length $v;
+            $self->{boundary} = $v;
+        }
+        elsif (   $p eq 'on_header'
+               || $p eq 'on_body'
+               || $p eq 'on_error') {
+            Carp::croak(qq/Parameter '$p' is not a CODE reference/)
+              unless ref $v eq 'CODE';
+            $self->{$p} = $v;
+        }
+        elsif (   $p eq 'max_header_size'
+               || $p eq 'max_preamble_size') {
+            Carp::croak(qq/Parameter '$p' is not a positive integer/)
+              unless ref \$v eq 'SCALAR' && defined $v && $v =~ /\A [1-9][0-9]* \z/x;
+            $self->{$p} = $v;
+        }
+        else {
+            Carp::croak(qq/Unknown parameter '$p' passed to constructor/);
+        }
+    }
+
+    for my $p (qw(boundary on_header on_body)) {
+        Carp::croak(qq/Mandatory parameter '$p' is missing/)
+          unless exists $self->{$p};
+    }
+
+    bless $self, $class;
     $self->{parser} = $_mk_parser->($self);
     return $self;
 }
