@@ -6,12 +6,13 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Cwd;
-use File::Spec::Functions;
-use PAML;
+use Parse::HTTP::Multipart qw[];
+use PAML                   qw[];
+use Cwd                    qw[getcwd];
+use File::Spec::Functions  qw[catdir catfile];
+
 use Test::More;
 use Test::Deep;
-use Parse::HTTP::Multipart;
 
 my $base = catdir(getcwd(), 't', 'data');
 
