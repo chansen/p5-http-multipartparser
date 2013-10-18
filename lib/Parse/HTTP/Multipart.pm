@@ -97,8 +97,6 @@ $_mk_parser = sub {
     my $boundary_preamble  =        '--' . $boundary;
     my $boundary_delimiter = CRLF . '--' . $boundary;
 
-    study $boundary_delimiter;
-
     my $body   = '';
     my $buffer = '';
     my $finish = FALSE;
