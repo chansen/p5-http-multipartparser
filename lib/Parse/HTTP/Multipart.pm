@@ -167,6 +167,8 @@ $_mk_parser = sub {
                             $on_error->(q/Continuation line seen before first header/);
                             return;
                         }
+                        next unless length;
+                        $headers[-1] .= ' ' unless $headers[-1] =~ /[\x09\x20]\z/;
                         $headers[-1] .= $_;
                     }
                     else {
