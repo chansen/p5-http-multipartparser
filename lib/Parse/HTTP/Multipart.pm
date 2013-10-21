@@ -71,6 +71,12 @@ sub finish {
     return $_[0]->{parser}->('', 1);
 }
 
+sub reset {
+    @_ == 1 || Carp::croak(q/Usage: $parser->reset()/);
+    $_[0]->{parser}  = $_mk_parser->($_[0]);
+    $_[0]->{aborted} = !!0;
+}
+
 sub is_aborted {
     @_ == 1 || Carp::croak(q/Usage: $parser->is_aborted()/);
     return $_[0]->{aborted};
