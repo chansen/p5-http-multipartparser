@@ -5,13 +5,13 @@ use warnings;
 
 use Test::More;
 use Test::Deep;
-use HTTP::MultipartParser;
+use HTTP::MultiPartParser;
 
 sub parse {
     my ($content) = @_;
 
     my ($error, @res);
-    my $parser = HTTP::MultipartParser->new(
+    my $parser = HTTP::MultiPartParser->new(
         boundary  => 'xxx',
         on_header => sub { push @res, [ $_[0], undef ]},
         on_body   => sub { $res[-1][1] .= $_[0] },
