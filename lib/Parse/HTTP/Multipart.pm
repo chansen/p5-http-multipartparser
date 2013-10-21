@@ -19,6 +19,7 @@ sub new {
         on_error          => \&Carp::croak,
         max_header_size   => 32 * 1024,
         max_preamble_size => 32 * 1024,
+        header_as         => 'lines',
     };
 
     while (my ($p, $v) = each %params) {
@@ -39,6 +40,11 @@ sub new {
             Carp::croak(qq/Parameter '$p' is not a positive integer/)
               unless ref \$v eq 'SCALAR' && defined $v && $v =~ /\A [1-9][0-9]* \z/x;
             $self->{$p} = $v;
+        }
+        elsif ($p eq 'header_as') {
+            Carp::croak(q/Parameter 'header_as' must be either 'lines' or 'unparsed'/)
+              unless ref \$v eq 'SCALAR' && defined $v && $v =~ /\A (?: lines | unparsed) \z/x;
+            $self->{header_as} = $v;
         }
         else {
             Carp::croak(qq/Unknown parameter '$p' passed to constructor/);
@@ -103,6 +109,27 @@ $_mk_parser = sub {
         goto $self->{on_error};
     };
     
+    if ($self->{header_as} eq 'lines') {
+        $on_header = sub {
+            my @headers;
+            for (split /\x0D\x0A/, $_[0]) {
+                if (s/\A[\x09\x20]+//) {
+                    if (!@headers) {
+                        $on_error->(q/Continuation line seen before first header/);
+                        return;
+                    }
+                    next unless length;
+                    $headers[-1] .= ' ' unless $headers[-1] =~ /[\x09\x20]\z/;
+                    $headers[-1] .= $_;
+                }
+                else {
+                    push @headers, $_;
+                }
+            }
+            $self->{on_header}->(\@headers);
+        };
+    }
+    
     return sub {
         $buffer .= $_[0];
         $finish  = $_[1];
@@ -160,24 +187,10 @@ $_mk_parser = sub {
                     last;
                 }
 
-                my @headers;
-                for (split /\x0D\x0A/, substr($buffer, 0, $pos)) {
-                    if (s/\A[\x09\x20]+//) {
-                        if (!@headers) {
-                            $on_error->(q/Continuation line seen before first header/);
-                            return;
-                        }
-                        next unless length;
-                        $headers[-1] .= ' ' unless $headers[-1] =~ /[\x09\x20]\z/;
-                        $headers[-1] .= $_;
-                    }
-                    else {
-                        push @headers, $_;
-                    }
-                }
+                $chunk = substr($buffer, 0, $pos);
                 substr($buffer, 0, $pos + 4, '');
                 $state = STATE_BODY;
-                $on_header->(\@headers);
+                $on_header->($chunk);
             }
             elsif ($state == STATE_BODY) {
                 my $take = index($buffer, $boundary_delimiter);
