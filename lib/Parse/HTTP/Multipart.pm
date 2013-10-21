@@ -113,7 +113,10 @@ $_mk_parser = sub {
         $on_header = sub {
             my @headers;
             for (split /\x0D\x0A/, $_[0]) {
-                if (s/\A[\x09\x20]+//) {
+                if (/\A [^\x00-\x1F\x7F:]+ : /x) {
+                    push @headers, $_;
+                }
+                elsif (s/\A [\x09\x20]+ //x) {
                     if (!@headers) {
                         $on_error->(q/Continuation line seen before first header/);
                         return;
@@ -123,7 +126,7 @@ $_mk_parser = sub {
                     $headers[-1] .= $_;
                 }
                 else {
-                    push @headers, $_;
+                    $on_error->(q/Malformed header line/);
                 }
             }
             $self->{on_header}->(\@headers);
@@ -187,8 +190,7 @@ $_mk_parser = sub {
                     last;
                 }
 
-                $chunk = substr($buffer, 0, $pos);
-                substr($buffer, 0, $pos + 4, '');
+                $chunk = substr($buffer, 0, $pos + 4, '');
                 $state = STATE_BODY;
                 $on_header->($chunk);
             }
