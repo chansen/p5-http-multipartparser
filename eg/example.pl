@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Parse::HTTP::Multipart qw[];
+use HTTP::MultipartParser qw[];
 use Hash::MultiValue       qw[];
 use IO::File               qw[SEEK_SET];
 use File::Temp             qw[];
@@ -11,7 +11,7 @@ my $params  = Hash::MultiValue->new;
 my $uploads = Hash::MultiValue->new;
 
 my $part;
-my $parser = Parse::HTTP::Multipart->new(
+my $parser = HTTP::MultipartParser->new(
     boundary  => '----------0xKhTmLbOuNdArY',
     on_header => sub {
         my ($headers) = @_;

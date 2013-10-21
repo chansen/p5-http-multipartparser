@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Parse::HTTP::Multipart qw[];
+use HTTP::MultipartParser qw[];
 use PAML                   qw[];
 use Cwd                    qw[getcwd];
 use File::Spec::Functions  qw[catdir catfile];
@@ -39,7 +39,7 @@ foreach my $number ('001'..'012') {
         }
     };
     
-    my $parser = Parse::HTTP::Multipart->new(
+    my $parser = HTTP::MultipartParser->new(
         boundary  => $test->{boundary},
         on_header => $on_header,
         on_body   => $on_body,

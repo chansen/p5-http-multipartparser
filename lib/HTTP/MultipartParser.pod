@@ -1,6 +1,6 @@
 =head1 NAME
 
-Parse::HTTP::Multipart - 
+HTTP::MultipartParser - 
 
 =head1 SYNOPSIS
 

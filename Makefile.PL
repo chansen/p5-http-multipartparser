@@ -1,10 +1,10 @@
 use strict;
 use inc::Module::Install;
 
-name           'Parse-HTTP-Multipart';
+name           'HTTP-MultipartParser';
 perl_version   '5.008001';
-all_from       'lib/Parse/HTTP/Multipart.pm';
-repository     'http://github.com/chansen/p5-parse-http-multipart';
+all_from       'lib/HTTP/MultipartParser.pm';
+repository     'http://github.com/chansen/p5-http-multipartparser';
 readme_from    'lib/Parse/HTTP/Multipart.pod';
 
 requires       'Carp'         => '0';

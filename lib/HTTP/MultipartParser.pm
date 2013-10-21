@@ -1,4 +1,4 @@
-package Parse::HTTP::Multipart;
+package HTTP::MultipartParser;
 
 use strict;
 use warnings;
