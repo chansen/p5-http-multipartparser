@@ -83,13 +83,6 @@ sub STATE_EPILOGUE () { 5 }
 $_mk_parser = sub {
     Scalar::Util::weaken(my $self = $_[0]);
 
-    my $on_header = $self->{on_header};
-    my $on_body   = $self->{on_body};
-    my $on_error  = sub {
-        $self->{aborted} = 1;
-        goto $self->{on_error};
-    };
-
     # RFC 2616 3.7.2 Multipart Types
     # The message body is itself a protocol element and MUST therefore use only
     # CRLF to represent line breaks between body-parts.
@@ -97,15 +90,24 @@ $_mk_parser = sub {
     my $boundary_preamble  =        '--' . $boundary;
     my $boundary_delimiter = CRLF . '--' . $boundary;
 
-    my $body   = '';
-    my $buffer = '';
-    my $finish = FALSE;
-    my $state  = STATE_PREAMBLE;
+    my $chunk   = '';
+    my $buffer  = '';
+    my $state   = STATE_PREAMBLE;
+    my $finish  = FALSE;
+    my $aborted = FALSE;
+    
+    my $on_header = $self->{on_header};
+    my $on_body   = $self->{on_body};
+    my $on_error  = sub {
+        $aborted = $self->{aborted} = TRUE;
+        goto $self->{on_error};
+    };
+    
     return sub {
         $buffer .= $_[0];
         $finish  = $_[1];
 
-        while (!$self->{aborted}) {
+        while (!$aborted) {
             if ($state == STATE_PREAMBLE) {
                 my $pos = index($buffer, $boundary_preamble);
                 if ($pos < 0) {
@@ -190,13 +192,13 @@ $_mk_parser = sub {
                     $state = STATE_BOUNDARY;
                 }
 
-                $body = substr($buffer, 0, $take, '');
+                $chunk = substr($buffer, 0, $take, '');
 
                 if ($state == STATE_BOUNDARY) {
                     substr($buffer, 0, 4 + length $boundary, '');
                 }
 
-                $on_body->($body, $state == STATE_BOUNDARY);
+                $on_body->($chunk, $state == STATE_BOUNDARY);
             }
             # RFC 2616 3.7.2 Multipart Types
             # Unlike in RFC 2046, the epilogue of any multipart message MUST be
@@ -214,7 +216,7 @@ $_mk_parser = sub {
                 Carp::croak(qq/panic: unknown state: $state/);
             }
         }
-        return !$self->{aborted};
+        return !$aborted;
     };
 };
 
