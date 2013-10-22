@@ -23,7 +23,7 @@ attributes inculde:
 
 The unquoted and unescaped I<boundary> parameter value from the Content-Type 
 header field. The I<boundary> parameter value consist of a restricted set of 
-characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046>.
+characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046#section-5.1.1>.
 
     DIGIT / ALPHA / "'" / "(" / ")" /
     "+" / "_" / "," / "-" / "." /
@@ -82,6 +82,16 @@ Method called with wrong number of arguments.
 =back
 
 =head1 SEE ALSO
+
+=over 4
+
+=item L<RFC 2616 section 3.7.2 Multipart Types|http://tools.ietf.org/html/rfc2616#section-3.7.2>
+
+=item L<RFC 2388 multipart/form-data|http://tools.ietf.org/html/rfc2388>
+
+=item L<RFC 2046 section 5.1.1 Common Syntax|http://tools.ietf.org/html/rfc2046#section-5.1.1>
+
+=back
 
 =head1 SUPPORT
 
