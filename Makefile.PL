@@ -3,9 +3,9 @@ use inc::Module::Install;
 
 name           'HTTP-MultiPartParser';
 perl_version   '5.008001';
-all_from       'lib/HTTP/MultipartParser.pm';
+all_from       'lib/HTTP/MultiPartParser.pm';
 repository     'http://github.com/chansen/p5-http-multipartparser';
-readme_from    'lib/HTTP/MultipartParser.pod';
+readme_from    'lib/HTTP/MultiPartParser.pod';
 
 requires       'Carp'         => '0';
 requires       'Scalar::Util' => '0';
