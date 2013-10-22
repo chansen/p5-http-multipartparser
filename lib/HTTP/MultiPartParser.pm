@@ -1,5 +1,4 @@
 package HTTP::MultiPartParser;
-
 use strict;
 use warnings;
 
@@ -13,7 +12,7 @@ use Scalar::Util qw[];
 my $_mk_parser;
 
 # RFC2046
-my $Boundary = qr<\A [0-9A-Za-z'()+_,-./:=?]+ \z>x;
+my $ValidBoundary = qr<\A [0-9A-Za-z'()+_,-./:=?]+ \z>x;
 
 sub new {
     my ($class, %params) = @_;
@@ -22,13 +21,13 @@ sub new {
         on_error          => \&Carp::croak,
         max_header_size   => 32 * 1024,
         max_preamble_size => 32 * 1024,
-        header_as         => 'lines',
+        on_header_as      => 'lines',
     };
 
     while (my ($p, $v) = each %params) {
         if ($p eq 'boundary') {
             Carp::croak(q/Parameter 'boundary' is not a valid boundary value/)
-              unless ref \$v eq 'SCALAR' && defined $v && $v =~ $Boundary;
+              unless ref \$v eq 'SCALAR' && defined $v && $v =~ $ValidBoundary;
             $self->{boundary} = $v;
         }
         elsif (   $p eq 'on_header'
@@ -44,10 +43,10 @@ sub new {
               unless ref \$v eq 'SCALAR' && defined $v && $v =~ /\A [1-9][0-9]* \z/x;
             $self->{$p} = $v;
         }
-        elsif ($p eq 'header_as') {
-            Carp::croak(q/Parameter 'header_as' must be either 'lines' or 'unparsed'/)
-              unless ref \$v eq 'SCALAR' && defined $v && $v =~ /\A (?: lines | unparsed) \z/x;
-            $self->{header_as} = $v;
+        elsif ($p eq 'on_header_as') {
+            Carp::croak(q/Parameter 'on_header_as' must be either 'unparsed' or 'lines'/)
+              unless ref \$v eq 'SCALAR' && defined $v && $v =~ /\A (?: unparsed | lines) \z/x;
+            $self->{on_header_as} = $v;
         }
         else {
             Carp::croak(qq/Unknown parameter '$p' passed to constructor/);
@@ -118,7 +117,7 @@ $_mk_parser = sub {
         goto $self->{on_error};
     };
     
-    if ($self->{header_as} eq 'lines') {
+    if ($self->{on_header_as} eq 'lines') {
         $on_header = sub {
             my @headers;
             for (split /\x0D\x0A/, $_[0]) {

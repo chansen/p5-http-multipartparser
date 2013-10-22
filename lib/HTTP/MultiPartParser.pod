@@ -51,6 +51,26 @@ characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046#section-5
 This callback will be invoked when the header of a part has successfully been 
 received. The callback will only be invoked once for each part.
 
+=item * C<on_header_as>
+
+    on_header_as => 'unparsed' | 'lines'
+
+Defines the C<$header> value for the C<on_header> callback.
+
+=over 4
+
+=item * C<unparsed>
+
+Callback invoked with a an octet string containing the unparsed header.
+
+=item * C<lines>
+
+Callback invoked with an ARRAY reference, where each element of the array is a 
+header line. Folding whitespace is removed from all lines and header continuation 
+lines are unwrapped.
+
+=back
+
 =item * C<on_body> (Mandatory)
 
     on_body => $callback->($chunk, $final)
@@ -72,26 +92,6 @@ receiving an error the parser is no longer useful in its current state.
 =item * C<max_header_size>
 
     max_header_size => 32768
-
-=item * C<header_as>
-
-    header_as => 'unparsed' | 'lines'
-
-Defines the C<$header> value for the C<on_header> callback.
-
-=over 8
-
-=item * C<unparsed>
-
-Callback invoked with a SCALAR containing the unparsed header.
-
-=item * C<lines>
-
-Callback invoked with an ARRAY reference, where each element of the array is a 
-header line. Folding whitespace is removed from all lines and header continuation 
-lines are unwrapped.
-
-=back
 
 =back
 
