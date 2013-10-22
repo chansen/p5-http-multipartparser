@@ -26,12 +26,12 @@ my $parser = HTTP::MultiPartParser->new(
         }
 
         (defined $disposition)
-          or die q/Content-Disposition header is missing in part/;
+          or die q/Content-Disposition header is missing/;
 
         my ($p) = split_header_words($disposition);
 
-        ($p->[0] eq 'form-data')
-          or die q/Disposition type is not form-data/;
+        (@$p && $p->[0] eq 'form-data')
+          or die qq/Invalid Content-Disposition: '$disposition'/;
 
         my ($name, $filename);
         for(my $i = 2; $i < @$p; $i += 2) {
@@ -40,7 +40,7 @@ my $parser = HTTP::MultiPartParser->new(
         }
 
         (defined $name)
-          or die q/Parameter 'name' is missing from Content-Disposition header/;
+          or die qq/Invalid Content-Disposition: '$disposition'/;
 
         $part = {
             name    => $name,
