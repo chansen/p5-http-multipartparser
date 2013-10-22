@@ -2,7 +2,8 @@
 use strict;
 use warnings;
 
-use HTTP::MultiPartParser qw[];
+use HTTP::MultiPartParser  qw[];
+use HTTP::Headers::Util    qw[split_header_words];
 use Hash::MultiValue       qw[];
 use IO::File               qw[SEEK_SET];
 use File::Temp             qw[];
@@ -16,14 +17,30 @@ my $parser = HTTP::MultiPartParser->new(
     on_header => sub {
         my ($headers) = @_;
 
-        my ($name, $filename);
+        my $disposition;
         foreach (@$headers) {
-            if (/\A Content-Disposition: /xi) {
-                ($name)     = / name="?([^\";]+)"?/;
-                ($filename) = / filename="?([^\"]*)"?/;
+            if (/\A Content-Disposition: [\x09\x20]* (.*)/xi) {
+                $disposition = $1;
                 last;
             }
         }
+
+        (defined $disposition)
+          or die q/Content-Disposition header is missing in part/;
+
+        my ($p) = split_header_words($disposition);
+
+        ($p->[0] eq 'form-data')
+          or die q/Disposition type is not form-data/;
+
+        my ($name, $filename);
+        for(my $i = 2; $i < @$p; $i += 2) {
+            if    ($p->[$i] eq 'name')     { $name     = $p->[$i + 1] }
+            elsif ($p->[$i] eq 'filename') { $filename = $p->[$i + 1] }
+        }
+
+        (defined $name)
+          or die q/Parameter 'name' is missing from Content-Disposition header/;
 
         $part = {
             name    => $name,
