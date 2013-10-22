@@ -52,6 +52,8 @@ my @tests = (
       [ ], 'Continuation line seen before first header' ],
     [ "--xxx${CRLF}${HT}Foo${CRLF}${CRLF}",
       [ ], 'Continuation line seen before first header' ],
+    [ "--xxx${CRLF}Foo${CRLF}${CRLF}",
+      [ ], 'Malformed header line' ],
 );
 
 foreach my $test (@tests) {
