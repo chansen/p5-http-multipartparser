@@ -8,6 +8,69 @@ HTTP::MultiPartParser -
 
 =head1 METHODS
 
+=head2 new
+
+    $parser = HTTP::MultiPartParser->new( %attributes );
+    
+This constructor returns a instance of C<HTTP::MultiPartParser>. Valid 
+attributes inculde:
+
+=over 4
+
+=item * C<boundary> (Mandatory)
+
+    boundary => $value
+
+The unquoted and unescaped I<boundary> parameter value from the Content-Type 
+header field. The I<boundary> parameter value consist of a restricted set of 
+characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046>.
+
+    DIGIT / ALPHA / "'" / "(" / ")" /
+    "+" / "_" / "," / "-" / "." /
+    "/" / ":" / "=" / "?"
+
+=item * C<on_header> (Mandatory)
+
+    on_header => $callback->($headers);
+
+=item * C<on_body> (Mandatory)
+
+    on_body => $callback->($chunk, $final);
+
+=item * C<on_error>
+
+    on_error => $callback->($message);
+
+=item * C<max_preamble_size>
+
+    max_preamble_size => 32768
+
+=item * C<max_header_size>
+
+    max_header_size => 32768
+
+=item * C<header_as>
+
+    header_as => 'lines' | 'unparsed'
+
+=back
+
+=head2 parse
+
+    $parser->parse($octets);
+
+=head2 finish
+
+    $parser->finish;
+
+=head2 reset
+
+    $parser->reset;
+
+=head2 is_aborted
+
+    $boolean = $parser->is_aborted;
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -22,15 +85,30 @@ Method called with wrong number of arguments.
 
 =head1 SUPPORT
 
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/chansen/p5-http-multipartparser/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 SOURCE CODE
+
+This is open source software. The code repository is available for public 
+review and contribution under the terms of the license.
+
+L<httsp://github.com/chansen/p5-http-multipartparser>
+
+    git clone https://github.com/chansen/p5-http-multipartparser
+
 =head1 AUTHOR
 
 Christian Hansen C<chansen@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2012 by Christian Hansen.
+Copyright 2012-2013 by Christian Hansen.
 
-This library is free software; you can redistribute it and/or modify 
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 
