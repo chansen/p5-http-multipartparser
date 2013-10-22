@@ -1,10 +1,25 @@
 =head1 NAME
 
-HTTP::MultiPartParser - 
+HTTP::MultiPartParser - HTTP MultiPart Parser
 
 =head1 SYNOPSIS
 
+    $parser = HTTP::MultiPartParser->new(
+        boundary  => $boundary,
+        on_header => $on_header,
+        on_body   => $on_body,
+    );
+    
+    while ($octets = read_octets_from_body()) {
+        $parser->parse($octets);
+    }
+    
+    $parser->finish;
+
 =head1 DESCRIPTION
+
+This class provides a Low level API for processing data streams conforming to 
+MultiPart types as defined in L<RFC 2616 3.7.2 Multipart Types|http://tools.ietf.org/html/rfc2616#section-3.7.2>.
 
 =head1 METHODS
 
@@ -31,7 +46,7 @@ characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046#section-5
 
 =item * C<on_header> (Mandatory)
 
-    on_header => $callback->($headers);
+    on_header => $callback->($header);
 
 =item * C<on_body> (Mandatory)
 
@@ -87,9 +102,9 @@ Method called with wrong number of arguments.
 
 =item L<RFC 2616 section 3.7.2 Multipart Types|http://tools.ietf.org/html/rfc2616#section-3.7.2>
 
-=item L<RFC 2388 multipart/form-data|http://tools.ietf.org/html/rfc2388>
-
 =item L<RFC 2046 section 5.1.1 Common Syntax|http://tools.ietf.org/html/rfc2046#section-5.1.1>
+
+=item L<RFC 2388 multipart/form-data|http://tools.ietf.org/html/rfc2388>
 
 =back
 
