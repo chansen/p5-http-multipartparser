@@ -12,6 +12,9 @@ use Scalar::Util qw[];
 
 my $_mk_parser;
 
+# RFC2046
+my $Boundary = qr<\A [0-9A-Za-z'()+_,-./:=?]+ \z>x;
+
 sub new {
     my ($class, %params) = @_;
 
@@ -24,8 +27,8 @@ sub new {
 
     while (my ($p, $v) = each %params) {
         if ($p eq 'boundary') {
-            Carp::croak(q/Parameter 'boundary' is not a non-empty string/)
-              unless ref \$v eq 'SCALAR' && defined $v && length $v;
+            Carp::croak(q/Parameter 'boundary' is not a valid boundary value/)
+              unless ref \$v eq 'SCALAR' && defined $v && $v =~ $Boundary;
             $self->{boundary} = $v;
         }
         elsif (   $p eq 'on_header'
