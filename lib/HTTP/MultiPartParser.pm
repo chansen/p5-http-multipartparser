@@ -133,6 +133,7 @@ $_mk_parser = sub {
                 }
                 else {
                     $on_error->(q/Malformed header line/);
+                    return;
                 }
             }
             $self->{on_header}->(\@headers);
