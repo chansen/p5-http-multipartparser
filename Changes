@@ -1,4 +1,4 @@
-0.02
+0.02 2017-04-10
   - Avoid relying on current working directory being in @INC
   - Removed early release warning from documentation
   - Changed Content-Disposition parser in eg/example.pl
