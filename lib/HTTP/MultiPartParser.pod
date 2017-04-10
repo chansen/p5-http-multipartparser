@@ -21,10 +21,6 @@ HTTP::MultiPartParser - HTTP MultiPart Parser
 This class provides a low-level API for processing MultiPart MIME data streams 
 conforming to MultiPart types as defined in L<RFC 2616|http://tools.ietf.org/html/rfc2616#section-3.7.2>.
 
-B<IMPORTANT:> This is an early release intended primarily for feedback from 
-people who have discussed it. The API is still subject to change. The 
-documentation is not complete, please see C<eg/example.pl> for an example.
-
 =head1 METHODS
 
 =head2 new
