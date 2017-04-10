@@ -1,4 +1,4 @@
-use lib 't';
+use lib '.';
 use strict;
 use inc::Module::Install;
 
