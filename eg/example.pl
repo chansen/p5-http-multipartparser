@@ -3,10 +3,54 @@ use strict;
 use warnings;
 
 use HTTP::MultiPartParser  qw[];
-use HTTP::Headers::Util    qw[split_header_words];
 use Hash::MultiValue       qw[];
 use IO::File               qw[SEEK_SET];
 use File::Temp             qw[];
+
+# extracts name and filename values from Content-Disposition header.
+# returns the escaped value, due to different behaviour across browsers. 
+# (see https://gist.github.com/chansen/7163968)
+sub extract_form_data {
+    local $_ = shift;
+    # Fast exit for common form-data disposition
+    if (/\A form-data; \s name="((?:[^"]|\\")*)" (?: ;\s filename="((?:[^"]|\\")*)" )? \z/x) {
+        return ($1, $2);
+    }
+
+    # disposition type must be form-data
+    s/\A \s* form-data \s* ; //xi
+      or return;
+
+    my (%p, $k, $v);
+    while (length) {
+        s/ ^ \s+   //x;
+        s/   \s+ $ //x;
+
+        # skip empty parameters and unknown tokens
+        next if s/^ [^\s"=;]* \s* ; //x;
+
+        # parameter name (token)
+        s/^ ([^\s"=;]+) \s* = \s* //x
+          or return;
+        $k = lc $1;
+        # quoted parameter value
+        if (s/^ "((?:[^"]|\\")*)" \s* (?: ; | $) //x) {
+            $v = $1;
+        }
+        # unquoted parameter value (token)
+        elsif (s/^ ([^\s";]*) \s* (?: ; | $) //x) {
+            $v = $1;
+        }
+        else {
+            return;
+        }
+        if ($k eq 'name' || $k eq 'filename') {
+            return if exists $p{$k};
+            $p{$k} = $v;
+        }
+    }
+    return exists $p{name} ? @p{qw(name filename)} : ();
+}
 
 my $params  = Hash::MultiValue->new;
 my $uploads = Hash::MultiValue->new;
@@ -28,17 +72,7 @@ my $parser = HTTP::MultiPartParser->new(
         (defined $disposition)
           or die q/Content-Disposition header is missing/;
 
-        my ($p) = split_header_words($disposition);
-
-        (@$p && $p->[0] eq 'form-data')
-          or die qq/Invalid Content-Disposition: '$disposition'/;
-
-        my ($name, $filename);
-        for(my $i = 2; $i < @$p; $i += 2) {
-            if    ($p->[$i] eq 'name')     { $name     = $p->[$i + 1] }
-            elsif ($p->[$i] eq 'filename') { $filename = $p->[$i + 1] }
-        }
-
+        my ($name, $filename) = extract_form_data($disposition);
         (defined $name)
           or die qq/Invalid Content-Disposition: '$disposition'/;
 
