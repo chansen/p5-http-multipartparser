@@ -12,7 +12,6 @@ use Cwd                    qw[getcwd];
 use File::Spec::Functions  qw[catdir catfile];
 
 use Test::More;
-use Test::Deep;
 
 my $base = catdir(getcwd(), 't', 'data');
 
@@ -58,7 +57,7 @@ foreach my $number ('001'..'012') {
         $parser->parse($buffer);
     }
     $parser->finish;
-    cmp_deeply(\@got, $exp, "$number-content.dat");
+    is_deeply(\@got, $exp, "$number-content.dat");
 }
 
 done_testing();
