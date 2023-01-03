@@ -5,7 +5,6 @@ use warnings;
 
 use HTTP::MultiPartParser;
 use Test::More;
-use Test::Deep;
 
 sub parse {
     my ($content) = @_;
@@ -49,7 +48,7 @@ foreach my $test (@tests) {
 
     (my $name = $content) =~ s/([^\x21-\x7E])/sprintf '\x%.2X', ord $1/eg;
 
-    cmp_deeply($got_parts, $exp_parts, "parts ($name)");
+    is_deeply($got_parts, $exp_parts, "parts ($name)");
     is($got_error, $exp_error, "error ($name)");
 }
 
